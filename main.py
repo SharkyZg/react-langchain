@@ -1,45 +1,36 @@
 from typing import Union, List
-
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from langchain.prompts import PromptTemplate
-from langchain.schema import AgentAction, AgentFinish
+from langchain.agents import initialize_agent, AgentType
 from langchain.tools import Tool, tool
-from langchain.tools.render import render_text_description
 
+# Load environment variables
 load_dotenv()
 
+# Define the tool
 @tool
 def get_text_length(text: str) -> int:
-    """Returns the length of a text by characters"""
+    """Returns the length of a string by characters."""
     text = text.strip("\n")
     return len(text)
 
 if __name__ == "__main__":
-    print("Hello, World!")
+    # Define the tools list
     tools = [get_text_length]
 
-    template = """Answer the following questions as best you can. You have access to the following tools:
+    # Define the LLM
+    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
-                {tools}
+    # Initialize the agent with Zero-Shot ReAct Agent and the custom prompt
+    agent = initialize_agent(
+        tools=tools,
+        llm=llm,
+        agent=AgentType.OPENAI_FUNCTIONS,
+        verbose=True
+    )
 
-                Use the following format:
+    # Run the agent with the question
+    res = agent.run({"input": "What is the length of 'Hello, World!'? Give me just the number."})
 
-                Question: the input question you must answer
-                Thought: you should always think about what to do
-                Action: the action to take, should be one of [{tool_names}]
-                Action Input: the input to the action
-                Observation: the result of the action
-                ... (this Thought/Action/Action Input/Observation can repeat N times)
-                Thought: I now know the final answer
-                Final Answer: the final answer to the original input question
-
-                Begin!
-
-                Question: {input}
-                Thought:
-                """
-
-    prompt = PromptTemplate.from_template(template).partial(tools=render_text_description(tools), tool_names=", ".join([t.name for t in tools]))
-
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0, stop=["\nObservation"])
+    print(f"The final answer is: {res.strip()}")
