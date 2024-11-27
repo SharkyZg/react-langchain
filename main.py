@@ -1,9 +1,7 @@
-from typing import Union, List
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from langchain.prompts import PromptTemplate
 from langchain.agents import create_openai_functions_agent, AgentExecutor
-from langchain.tools import Tool, tool
+from langchain.tools import tool
 from langchain import hub
 
 
