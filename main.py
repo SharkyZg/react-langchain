@@ -37,7 +37,6 @@ if __name__ == "__main__":
 
     agent_executor = AgentExecutor(agent=agent, tools=tools)
 
-
     # Run the agent with the question
     result = agent_executor.invoke({"input":"What is the length of 'What is the length of word dog 12345 multiplied by cat 2 times?'? Explain your reasoning, are you using any tools? What is the name of the tool?"})
 
